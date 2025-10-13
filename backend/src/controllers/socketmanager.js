@@ -31,7 +31,7 @@ export const initializeSocket = (server)=>
             {
                 messages[path].forEach(element =>
                 {
-                   io.to(socket.id).emit("chat-message",element.sender,element.data,element.socketidsender);
+                   io.to(socket.id).emit("chat-message",element.data,element.sender,element.socketidsender);
                 }
                 )
             }
@@ -65,12 +65,45 @@ export const initializeSocket = (server)=>
                 }
 
                 messages[currroom].push({'sender':sender, 'data':data, 'socketidsender':socket.id});
+                console.log(socket.id);
+
+                connections[currroom].forEach(element =>
+                {
+                    io.to(element).emit("chat-message",data,sender,socket.id);
+                }
+                )
             }
         });
 
 
         socket.on("disconnect", ()=>
         {
+            var timediff = Math.abs(timeOnline[socket.id] - new Date());
+
+            var key;
+
+            for(const[v,k] of JSON.parse(JSON.stringify(Object.entries(connections))))
+            {
+                for(let i = 0;i<v.length;++i)
+                {
+                    if(v[i] == socket.id)
+                    {
+                        key = k;
+                        for(let a = 0;a<connections[key].length;++a)
+                        {
+                            io.to(connections[key][a]).emit('user-left',socket.id);
+                        }
+
+                        var index = connections[key].indexOf(socket.id);
+                        connections[key].splice(index,1);
+
+                        if(connections[key].length == 0)
+                        {
+                            delete connections[key];
+                        }
+                    }
+                }
+            }
 
         })
     })
