@@ -1,0 +1,55 @@
+.landingpagecontainer {
+  width: 100vw;
+  min-height: 100vh;
+  background: url("/public/background_landing.png") no-repeat center center;
+  background-size: cover;
+
+}
+
+.navlogo{
+
+    height: clamp(1.5rem, 7vw, 4rem);
+    border-radius: 20%;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3rem;
+  
+}
+.landingpagecontainer .navbar .navlist{
+  display: flex;
+
+}
+
+
+.middlelanding
+{
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  padding-top: 7rem;
+  flex-direction: column;
+  animation: float 3s ease-in-out infinite;
+
+}
+
+@keyframes float {
+
+  0%{
+    transform: translateY(0px);
+  }
+  
+   50%{
+    transform: translateY(-20px);
+  }
+  
+
+   100%{
+    transform: translateY(0px);
+  }
+  
+}
