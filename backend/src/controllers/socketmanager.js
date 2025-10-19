@@ -55,11 +55,11 @@ export const initializeSocket = (server)=>
         {
 
             const [currroom,found] = Object.entries(connections)
-            .reduce(([roomkey,isfound], [roomkey,roomvalue]) =>
+            .reduce(([roomkey,isfound], [croomkey,roomvalue]) =>
             {
                 if(!isfound && roomvalue.includes(socket.id))
                 {
-                    return [roomkey,true];
+                    return [croomkey,true];
                 }
                   return [roomkey,isfound];
             },['', false]);

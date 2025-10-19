@@ -12,6 +12,9 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { AuthContext } from '../contexts/AuthContext';
+import Snackbar from '@mui/material/Snackbar';
+import httpStatus from "http-status";
 
 
 
@@ -32,8 +35,11 @@ export default function Authentication() {
     })
 
     const [formstate, setformstate] = React.useState(0);
-    const [message, setmessage] = React.useState();
+    const [message, setmessage] = React.useState("hh");
     const [error, seterror] = React.useState();
+    const [open,setopen] = React.useState(false);
+
+    const {handleregister, handlelogin} = React.useContext(AuthContext)
 
 
     function handleformdata(e)
@@ -42,10 +48,45 @@ export default function Authentication() {
             setformdata({...formdata, [e.target.name]:e.target.value})
         
     }
-    function handleSubmit(e)
+
+    let  handleauth = async ()=>
     {
-        alert(formdata.username);
+      event.preventDefault();
+      try{
+        
+      if(formstate === 0)
+      {
+        let result = await handlelogin(formdata.username, formdata.password);
+        console.log(result); 
+        setmessage(result);
+        setopen(true);
+      }
+      }
+      catch(e)
+      {
+        seterror(e.response.data.message);
+      }
+
+      try{
+      if(formstate === 1)
+      {
+        let result = await handleregister(formdata.fullname,formdata.username, formdata.password);
+        console.log(result); 
+        setmessage(result);
+        setopen(true);
+      }
+      }
+      catch(e)
+      {
+       
+        
+        seterror(e.response.data.message);
+      }
+
+
+    
     }
+ 
 
   
   return (
@@ -90,7 +131,7 @@ export default function Authentication() {
             </div>
 
 
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: "100%", maxWidth: 480, mx: "auto" }} >
+            <Box component="form" noValidate onSubmit={handleauth}  sx={{ mt: 1, width: "100%", maxWidth: 480, mx: "auto" }} >
 
 
                 {formstate === 1?<TextField
@@ -127,19 +168,23 @@ export default function Authentication() {
                  onChange={handleformdata}
               />
 
-               
+               <Snackbar
+                open={open}
+                autoHideDuration={4000}
+                message={message}
+
+               ></Snackbar>
               
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
+             
               <Button
-                type="submit"
+               type='submit'
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+              
               >
-                Sign In
+              {formstate === 0? "Sign in" : "Register"}
+                
               </Button>
             </Box>
           </Box>
