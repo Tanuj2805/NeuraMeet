@@ -64,7 +64,8 @@ export default function Authentication() {
       }
       catch(e)
       {
-        seterror(e.response.data.message);
+        setmessage(e.response.data.message);
+        setopen(true);
       }
 
       try{
