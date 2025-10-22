@@ -34,7 +34,7 @@ const login = async (req,res) =>
 
     }
     else{
-      return res.status(500).json({message:"Wrong Password"});   
+      return res.status(httpStatus.UNAUTHORIZED).json({message:"Wrong Username or Password"});   
     }
     }
     catch(e)
