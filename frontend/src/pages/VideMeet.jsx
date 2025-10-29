@@ -4,6 +4,8 @@ import { useRef } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useEffect } from 'react';
+import { io } from "socket.io-client";
+
 
 
 const server_url= "http://localhost:8000";
@@ -55,7 +57,7 @@ export default function VideMeet() {
             }
 
 
-             const audiopermission = await navigator.mediaDevices.getUserMedia({audio:true})
+            const audiopermission = await navigator.mediaDevices.getUserMedia({audio:true});
 
             if(audiopermission)
             {
@@ -69,22 +71,103 @@ export default function VideMeet() {
             if(navigator.mediaDevices.getDisplayMedia)
             {
                 setscreenavailable(true);
-            }
+            }   
             else
-                screenavailable(false);
+                setscreenavailable(false);
+
+            if(videoavail || audioavail)
+            {
+                const usermediastream = await navigator.mediaDevices.getUserMedia({video:videoavail, audio:audioavail}); 
+                if(usermediastream)
+                {
+                    window.localStream = usermediastream;
+                    
+                    if(localvideoref.current)
+                    {
+                        localvideoref.current.srcObject = usermediastream; 
+                    }
+                }
+            }
+
+            
 
 
         }
         catch(e)
         {
+            console.log(e);
 
+        }
+    }
+
+    let getusermediasuccess = (stream)=>
+    {
+
+    }
+   let getusermedia= ()=>
+    {
+        if((video && videoavail) && (audio && audioavail))
+        {
+            navigator.mediaDevices.getUserMedia({video: video, audio:audio})
+            .then(getusermediasuccess)
+            .then((stream) =>{})
+            .catch((e)=>
+            {
+                console.log(e);
+            })
+        }
+        else
+        {
+            try{
+                let track = localvideoref.current.srcObject.getTracks();
+                track.forEach(t => t.stop())
+                 
+            }
+            catch(e)
+            {
+                s
+            }
         }
     }
 
     useEffect(()=>
     {
         getpermission();
-    })
+    },[]);
+
+    useEffect(()=>
+    {
+        if(video !== undefined && audio !== undefined)
+        {
+            getusermedia();
+        }
+    },[video,audio])
+
+
+    let connectToSocketServer = ()=>
+    {
+        socketref.current = io.connect(server_url,{secure:false});
+
+        socketref.current.on("connect", ()=>
+        {
+            socketref.current.emit("join-call", window.location.href);
+            socketIdref.current = socketref.current.id;
+        })
+    }
+
+
+    let getmedia = () =>
+    {
+        setaudio(audioavail);
+        setvideo(videoavail);
+        connectToSocketServer();
+    }
+
+    let connect = () =>
+    {
+        setaskForUsername(false);
+        getmedia();
+    }
 
 
 
@@ -96,7 +179,7 @@ export default function VideMeet() {
        
         <h2>Enter Your Username</h2>
         <TextField id="outlined-basic" label="Username" variant="outlined" required value={username} onChange={e => {setusername(e.target.value)}} />
-        <Button variant="contained">Connect</Button>
+        <Button variant="contained" onClick={connect}>Connect</Button>
 
         <div>
             <video ref={localvideoref} autoPlay muted></video>

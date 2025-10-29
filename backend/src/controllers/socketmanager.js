@@ -8,6 +8,7 @@ let timeOnline = {};
 
 export const initializeSocket = (server)=>
 {
+    
     const io = new Server(server, {
         cors:{
             origin: "*",
@@ -20,6 +21,7 @@ export const initializeSocket = (server)=>
 
     io.on("connection", (socket)=>
     {
+        console.log("someone connected");
         socket.on("join-call", (path)=>
         {
             if(connections[path] === undefined)
