@@ -142,17 +142,35 @@ export default function VideMeet() {
             getusermedia();
         }
     },[video,audio])
+    
+
+    let addmessage = ()=>
+    {
+
+    }
+
+    let gotmessagefromserver= ()=>
+    {
+        
+    }
+
+
 
 
     let connectToSocketServer = ()=>
     {
+
         socketref.current = io.connect(server_url,{secure:false});
+
+        socketref.current.on('signal',gotmessagefromserver)
 
         socketref.current.on("connect", ()=>
         {
             socketref.current.emit("join-call", window.location.href);
             socketIdref.current = socketref.current.id;
         })
+
+        socketref.current.on("chat-message", addmessage);
     }
 
 
