@@ -195,10 +195,10 @@ export default function VideMeet() {
 
                     connections[sockelistid].onaddstream = (event)=>
                     {
-                        
+
                     }
                 }
-            })
+            )})
         })
 
         
