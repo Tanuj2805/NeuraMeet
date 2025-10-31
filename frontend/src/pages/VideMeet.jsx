@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useEffect } from 'react';
 import { io } from "socket.io-client";
+import { UNSAFE_createClientRoutes } from 'react-router-dom';
 
 
 
@@ -125,7 +126,7 @@ export default function VideMeet() {
             }
             catch(e)
             {
-                s
+                
             }
         }
     }
@@ -168,9 +169,39 @@ export default function VideMeet() {
         {
             socketref.current.emit("join-call", window.location.href);
             socketIdref.current = socketref.current.id;
+            socketref.current.on("chat-message", addmessage);
+            socketref.current.on("user-left", (id)=>{
+                setvideos(videos=>
+                {
+                    videos.filter(video=> video.socketId !== id);
+                })
+            });
+
+            socketref.current.on("user-joined", (id,client)=>
+            {
+                client.forEach((sockelistid)=>
+                {
+                    connections[sockelistid] = new RTCPeerConnection(peerconfigconnection);
+
+                    connections[sockelistid].onicecandidate = (event)=>
+                    {
+                        if(event.candidate !== null)
+                        {
+                            socketref.current.emit("signal", sockelistid, JSON.stringify({'ice':event.candidate}))
+                        }
+
+
+                    }
+
+                    connections[sockelistid].onaddstream = (event)=>
+                    {
+                        
+                    }
+                }
+            })
         })
 
-        socketref.current.on("chat-message", addmessage);
+        
     }
 
 
